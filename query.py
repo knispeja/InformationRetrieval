@@ -1,3 +1,5 @@
+import os
+
 def bm25(query):
     # TODO: get average document length
     print("Not implemented")
@@ -27,5 +29,7 @@ def split_nonalphanumeric(s):
         split_str.append(s[lastPos:pos])
     return split_str
 
-query = raw_input("Enter something")
-print split_nonalphanumeric(query)
+
+query = raw_input("Enter your search query:\n")
+for doc in os.listdir('./Presidents/edited'):
+    overall_score(query, doc)
