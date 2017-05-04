@@ -1,15 +1,16 @@
 import os
 
-def bm25(query):
-    # TODO: get average document length
-    print("Not implemented")
+def bm25(query, documents):
+    # Get average document length
+    averageLength = 0
+    for docName, docText in documents:
+        averageLength += len(docText)
+    averageLength /= len(documents)
+
+    print(averageLength)
 
 
-def skip_bigrams(raw_text):
-    print("Not implemented")
-
-
-def overall_score(query, document):
+def skip_bigrams(query, documents):
     print("Not implemented")
 
 
@@ -31,5 +32,10 @@ def split_nonalphanumeric(s):
 
 
 query = raw_input("Enter your search query:\n")
-for doc in os.listdir('./Presidents/edited'):
-    overall_score(query, doc)
+presidents = []
+directory = './Presidents/edited'
+for doc in os.listdir(directory):
+    docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
+    presidents.append((doc, docText))
+
+bm25(query, presidents)
