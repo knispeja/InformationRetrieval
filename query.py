@@ -12,10 +12,20 @@ def overall_score(query, document):
 
 
 def split_nonalphanumeric(s):
-    pos = 1
-    while pos < len(s) and s[pos].isalnum():
+    split_str = []
+    lastPos = 0
+    pos = 0
+    while pos < len(s):
+        if not s[pos].isalnum():
+            if lastPos == pos:
+                lastPos += 1
+            else:
+                split_str.append(s[lastPos:pos])
+                lastPos = pos + 1
         pos += 1
-    return (s[:pos], s[pos:])
+    if lastPos != pos:
+        split_str.append(s[lastPos:pos])
+    return split_str
 
 query = raw_input("Enter something")
 print split_nonalphanumeric(query)
