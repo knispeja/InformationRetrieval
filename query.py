@@ -75,4 +75,10 @@ for doc in os.listdir(directory):
     docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
     presidents.append((doc, docText))
 
-print bm25(split_nonalphanumeric(query), presidents)
+scored_bm25 = bm25(split_nonalphanumeric(query), presidents)
+scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
+num_to_print = 4
+for doc_name, score in scored_bm25:
+    if num_to_print > 0:
+        print((doc_name, score))
+    num_to_print-=1
