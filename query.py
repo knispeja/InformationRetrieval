@@ -5,6 +5,7 @@ directory = './presidents/curated'
 k1 = 2
 b = 0.4
 results_to_show = 10
+max_reasonable_score = 8
 
 def bm25(query, bigram_query, documents):
     # Document names to scores
@@ -100,21 +101,28 @@ while True:
     scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
 
     # Calculate average score for nonzero elems
-    zero_elements = 0
-    for doc_name, score in scored_bm25:
-        if score == 0:
-            zero_elements += 1
-    nonzero_elements = len(scored_bm25) - zero_elements
-    avg_score = sum(x[1] for x in scored_bm25)/nonzero_elements
+    # zero_elements = 0
+    # for doc_name, score in scored_bm25:
+    #     if score == 0:
+    #         zero_elements += 1
+    # nonzero_elements = len(scored_bm25) - zero_elements
+    # if nonzero_elements < 1:
+    #     avg_score = 0
+    # else:
+    #     avg_score = sum(x[1] for x in scored_bm25)/nonzero_elements
 
     # Compute confidence levels
     doc_to_confidence = []
     for doc_name, score in scored_bm25:
-        doc_to_confidence.append((doc_name, (score - avg_score)**2))
+        confidence = score/max_reasonable_score
+        confidence *= 100
+        if confidence > 99:
+            confidence = 99
+        doc_to_confidence.append((doc_name, confidence))
 
     # Print results
     num_to_print = results_to_show
-    for doc_name, confidence in scored_bm25:
+    for doc_name, confidence in doc_to_confidence:
         if num_to_print > 0:
             print(doc_name + " ~~ " + str(confidence) + "% confidence")
         num_to_print -= 1
