@@ -1,9 +1,10 @@
 import os, math
 
 # Constants
-directory = './Presidents/edited'
+directory = './presidents/curated'
 k1 = 2
 b = 0.4
+results_to_show = 10
 
 def bm25(query, bigram_query, documents):
     # Document names to scores
@@ -80,21 +81,40 @@ def create_skip_bigrams(arr):
 
     return bigrams
 
+# Process documents in the specified directory
+presidents = []
+for doc in os.listdir(directory):
+    docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
+    presidents.append((doc, docText, create_skip_bigrams(docText)))
+
+# Allow repeated queries
 while True:
+    # Take user input
     query = raw_input("Enter your search query, or 'q' to quit:\n")
     if query == "q":
         break
     query = split_nonalphanumeric(query)
 
-    presidents = []
-    for doc in os.listdir(directory):
-        docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
-        presidents.append((doc, docText, create_skip_bigrams(docText)))
-
+    # Create scores for each document, and sort them
     scored_bm25 = bm25(query, create_skip_bigrams(query), presidents)
     scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
-    num_to_print = 10
+
+    # Calculate average score for nonzero elems
+    zero_elements = 0
     for doc_name, score in scored_bm25:
+        if score == 0:
+            zero_elements += 1
+    nonzero_elements = len(scored_bm25) - zero_elements
+    avg_score = sum(x[1] for x in scored_bm25)/nonzero_elements
+
+    # Compute confidence levels
+    doc_to_confidence = []
+    for doc_name, score in scored_bm25:
+        doc_to_confidence.append((doc_name, (score - avg_score)**2))
+
+    # Print results
+    num_to_print = results_to_show
+    for doc_name, confidence in scored_bm25:
         if num_to_print > 0:
-            print((doc_name, score))
+            print(doc_name + " ~~ " + str(confidence) + "% confidence")
         num_to_print -= 1
