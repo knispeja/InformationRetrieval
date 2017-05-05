@@ -33,15 +33,16 @@ def bm25(query, documents):
         idf_sum = 0
         for word in query:
             nq = documents_containing[word]
-            idf_sum += math.log(
+            idf_sum += math.log10(
                 (len(documents) - nq + 0.5)/
                 (nq + 0.5)
             )
         term_freq = word_frequency[(word, doc_name)]
         score = idf_sum * (
             (term_freq*(k1 + 1))/
-            (term_freq + k1*(1-b+b*(len(doc_text)/average_length)))
+            (term_freq + k1*((1-b)+b*(len(doc_text)/average_length)))
         )
+
         scored_documents.append((doc_name, score))
 
     return scored_documents
@@ -64,7 +65,7 @@ def split_nonalphanumeric(s):
                 last_pos = pos + 1
         pos += 1
     if last_pos != pos:
-        split_str.append(s[last_pos:pos])
+        split_str.append(s[last_pos:pos].lower())
     return split_str
 
 
