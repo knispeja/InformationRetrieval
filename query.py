@@ -2,8 +2,8 @@ import os, math
 
 # Constants
 directory = './Presidents/edited'
-k1 = 1.5
-b = 0.75
+k1 = 2
+b = 0.4
 
 def bm25(query, documents):
     # Document names to scores
@@ -48,10 +48,6 @@ def bm25(query, documents):
     return scored_documents
 
 
-def skip_bigrams(query, documents):
-    print("Not implemented")
-
-
 def split_nonalphanumeric(s):
     split_str = []
     last_pos = 0
@@ -68,16 +64,30 @@ def split_nonalphanumeric(s):
         split_str.append(s[last_pos:pos].lower())
     return split_str
 
+def create_skip_bigrams(arr):
+    if len(arr) < 2:
+        return arr
+
+    bigrams = []
+    for i in range(0, len(arr) - 1):
+        bigrams.append((arr[i], arr[i+1]))
+        if i < len(arr) - 2:
+            bigrams.append((arr[i], arr[i+2]))
+
+    return bigrams
+
 while True:
     query = raw_input("Enter your search query, or 'q' to quit:\n")
     if query == "q":
         break
+    query = split_nonalphanumeric(query)
+
     presidents = []
     for doc in os.listdir(directory):
         docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
         presidents.append((doc, docText))
 
-    scored_bm25 = bm25(split_nonalphanumeric(query), presidents)
+    scored_bm25 = bm25(query, presidents)
     scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
     num_to_print = 10
     for doc_name, score in scored_bm25:
