@@ -43,7 +43,7 @@ def bm25(query, documents):
             (term_freq + k1*((1-b)+b*(len(doc_text)/average_length)))
         )
 
-        scored_documents.append((doc_name, score))
+        scored_documents.append((doc_name, abs(score)))
 
     return scored_documents
 
