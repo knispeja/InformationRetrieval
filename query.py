@@ -42,6 +42,9 @@ def bm25(query, documents):
             (term_freq*(k1 + 1))/
             (term_freq + k1*(1-b+b*(len(doc_text)/average_length)))
         )
+        scored_documents.append((doc_name, score))
+
+    return scored_documents
 
 
 def skip_bigrams(query, documents):
@@ -71,4 +74,4 @@ for doc in os.listdir(directory):
     docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
     presidents.append((doc, docText))
 
-bm25(split_nonalphanumeric(query), presidents)
+print bm25(split_nonalphanumeric(query), presidents)
