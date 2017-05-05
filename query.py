@@ -38,12 +38,12 @@ def bm25(query, documents):
                 (nq + 0.5)
             )
             term_freq = word_frequency[(word, doc_name)]
-            score += idf_sum * (
+            score += abs(idf_sum * (
                 (term_freq * (k1 + 1)) / 
                 (term_freq + k1 * ((1 - b) + b * (len(doc_text) / average_length)))
-            )
+            ))
 
-        scored_documents.append((doc_name, abs(score)))
+        scored_documents.append((doc_name, score))
 
     return scored_documents
 
@@ -70,9 +70,9 @@ def create_skip_bigrams(arr):
 
     bigrams = []
     for i in range(0, len(arr) - 1):
-        bigrams.append((arr[i], arr[i+1]))
+        bigrams.append((arr[i], arr[i + 1]))
         if i < len(arr) - 2:
-            bigrams.append((arr[i], arr[i+2]))
+            bigrams.append((arr[i], arr[i + 2]))
 
     return bigrams
 
