@@ -16,8 +16,8 @@ def bm25(query, documents):
     average_length /= len(documents)
 
     # Computing document name to word frequency
-    documents_containing = {} # items like word -> count
-    word_frequency = {} # items like (word, doc_name) -> frequency
+    documents_containing = {}  # items like word -> count
+    word_frequency = {}  # items like (word, doc_name) -> frequency
     for word in query:
         for doc_name, doc_text in documents:
             frequency = doc_text.count(word)
@@ -30,18 +30,18 @@ def bm25(query, documents):
 
     # Score each document
     for doc_name, doc_text in documents:
-        idf_sum = 0
+        score = 0
         for word in query:
             nq = documents_containing[word]
-            idf_sum += math.log10(
-                (len(documents) - nq + 0.5)/
+            idf_sum = math.log10(
+                (len(documents) - nq + 0.5) / 
                 (nq + 0.5)
             )
-        term_freq = word_frequency[(word, doc_name)]
-        score = idf_sum * (
-            (term_freq*(k1 + 1))/
-            (term_freq + k1*((1-b)+b*(len(doc_text)/average_length)))
-        )
+            term_freq = word_frequency[(word, doc_name)]
+            score += idf_sum * (
+                (term_freq * (k1 + 1)) / 
+                (term_freq + k1 * ((1 - b) + b * (len(doc_text) / average_length)))
+            )
 
         scored_documents.append((doc_name, abs(score)))
 
@@ -79,8 +79,8 @@ while True:
 
     scored_bm25 = bm25(split_nonalphanumeric(query), presidents)
     scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
-    num_to_print = 4
+    num_to_print = 10
     for doc_name, score in scored_bm25:
         if num_to_print > 0:
             print((doc_name, score))
-        num_to_print-=1
+        num_to_print -= 1
