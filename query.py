@@ -5,13 +5,13 @@ directory = './Presidents/edited'
 k1 = 2
 b = 0.4
 
-def bm25(query, documents):
+def bm25(query, bigram_query, documents):
     # Document names to scores
     scored_documents = []
 
     # Get average document length
     average_length = 0
-    for docName, docText in documents:
+    for docName, docText, doc_bigrams in documents:
         average_length += len(docText)
     average_length /= len(documents)
 
@@ -19,19 +19,26 @@ def bm25(query, documents):
     documents_containing = {}  # items like word -> count
     word_frequency = {}  # items like (word, doc_name) -> frequency
     for word in query:
-        for doc_name, doc_text in documents:
+        for doc_name, doc_text, doc_bigrams in documents:
             frequency = doc_text.count(word)
             if word not in documents_containing:
                 documents_containing[word] = 0
             if frequency > 0:
                 documents_containing[word] += 1
-
             word_frequency[(word, doc_name)] = frequency
+    for bigram in bigram_query:
+        for doc_name, doc_text, doc_bigrams in documents:
+            frequency = doc_bigrams.count(bigram)
+            if bigram not in documents_containing:
+                documents_containing[bigram] = 0
+            if frequency > 0:
+                documents_containing[bigram] += 1
+            word_frequency[(bigram, doc_name)] = frequency
 
     # Score each document
-    for doc_name, doc_text in documents:
+    for doc_name, doc_text, doc_bigrams in documents:
         score = 0
-        for word in query:
+        for word in (query + bigram_query):
             nq = documents_containing[word]
             idf_sum = math.log10(
                 (len(documents) - nq + 0.5) / 
@@ -65,9 +72,6 @@ def split_nonalphanumeric(s):
     return split_str
 
 def create_skip_bigrams(arr):
-    if len(arr) < 2:
-        return arr
-
     bigrams = []
     for i in range(0, len(arr) - 1):
         bigrams.append((arr[i], arr[i + 1]))
@@ -85,9 +89,9 @@ while True:
     presidents = []
     for doc in os.listdir(directory):
         docText = split_nonalphanumeric(open(directory + "/" + doc, "r").read())
-        presidents.append((doc, docText))
+        presidents.append((doc, docText, create_skip_bigrams(docText)))
 
-    scored_bm25 = bm25(query, presidents)
+    scored_bm25 = bm25(query, create_skip_bigrams(query), presidents)
     scored_bm25 = sorted(scored_bm25, key=lambda x: x[1], reverse=True)
     num_to_print = 10
     for doc_name, score in scored_bm25:
