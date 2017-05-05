@@ -61,7 +61,7 @@ def split_nonalphanumeric(s):
             if last_pos == pos:
                 last_pos += 1
             else:
-                split_str.append(s[last_pos:pos])
+                split_str.append(s[last_pos:pos].lower())
                 last_pos = pos + 1
         pos += 1
     if last_pos != pos:
